@@ -3,6 +3,8 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
+
 
 /*
  * 1 - ex, 2 - w, 4 - r
@@ -24,7 +26,24 @@ int main(int argc, char * argv[]){
         fprintf(stderr, "%s: incorrect filemode\n", argv[2]);
         exit(1);
     }
-    l=creat(argv[1], p);
+    l = creat(argv[1], p);
     printf("l=%d\n", l);
+
+    printf("Opening file for reading...");
+    int fd;
+    if ((fd=open("file.txt", O_RDONLY))==-1){
+        perror(argv[1]);
+        close(fd);
+    }
+    close(fd);
+
+    printf("Opening file for reading and writing...");
+    if ((fd=open(argv[1], O_RDWR))==-1){
+        perror(argv[1]);
+        close(fd);
+    }
+    close(fd);
+
+
     exit(0);
 }
