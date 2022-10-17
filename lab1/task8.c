@@ -4,13 +4,14 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+
+int cpy(int, int);
+
 int main(int argc, char *argv[])
 {
     int fd1, fd2;
     char* file1, *file2;
     int got_input = 0;
-    char buffer[1024] = {0};
-    long int bytes_count = 1024;
 
     if (argc == 3) {
         file1 = argv[1];
@@ -32,22 +33,32 @@ int main(int argc, char *argv[])
         perror("Problem reading input");
         exit(1);
     }
-    //if(got_input)
-    //fchmod(fd2, 0755)
 
-     while((bytes_count = read(fd1, buffer, 1024)) > 0){
-        printf("Read %ld bytes\n", bytes_count);
-        if(write(fd2, buffer, bytes_count) != bytes_count){
-            perror("Writing error");
-            exit(1);
-        }
-    }
+    cpy(fd1, fd2);
+
     close(fd1);
     close(fd2);
     if (got_input) {
         free(file1);
         free(file2);
     }
-    printf("Successfully wrote all the contents!\n");
     exit(0);
 }
+
+
+
+int cpy(int fd1, int fd2){
+    char buffer[1024] = {0};
+    long bytes_count = 1024;
+    while((bytes_count = read(fd1, buffer, 1024)) > 0){
+        printf("Read %ld bytes\n", bytes_count);
+        if(write(fd2, buffer, bytes_count) != bytes_count){
+            perror("Writing error");
+            exit(1);
+        }
+    }
+    printf("Successfully wrote all the contents!\n");
+    return 0;
+}
+
+
