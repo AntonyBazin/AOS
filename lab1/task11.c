@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     char* largest_file_name;
     struct stat st_buf;
 
-    if (argc != 2){
+    if (argc <= 2){
         printf("Usage: %s filenames\n", argv[0]);
         exit(1);
     }

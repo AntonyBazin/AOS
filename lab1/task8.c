@@ -7,41 +7,30 @@
 
 int cpy(int, int);
 
-int main(int argc, char *argv[])
-{
-    int fd1, fd2;
+int main(int argc, char *argv[]){
+    int fd1 = STDIN_FILENO;
+    int fd2 = STDOUT_FILENO;
     char* file1, *file2;
-    int got_input = 0;
+    int cpy_flag = 0;
 
     if (argc == 3) {
         file1 = argv[1];
         file2 = argv[2];
-    } else if (argc == 1) {
-        got_input = 1;
-        file1 = calloc(30, sizeof(*file1));
-        file2 = calloc(30, sizeof(*file2));
-        printf("Enter first file name: ");
-        scanf("%s", file1);
-        printf("Enter second file name: ");
-        scanf("%s", file2);
-    } else {
+        if(((fd1 = open(file1, O_RDONLY)) == -1) || ((fd2=open(file2, O_CREAT|O_WRONLY|O_TRUNC, 0755)) == -1)){
+			perror("Problem reading input");
+			exit(1);
+        }
+    } else if(argc == 2){
         printf("Usage: %s [file1 file2]\n", argv[0]);
         exit(1);
     }
 
-    if(((fd1 = open(file1, O_RDONLY)) == -1) || ((fd2=open(file2, O_CREAT|O_WRONLY|O_TRUNC, 0755)) == -1)){
-        perror("Problem reading input");
-        exit(1);
+    if(cpy_flag = cpy(fd1, fd2)){
+    	perror("Copying error!");
     }
-
-    cpy(fd1, fd2);
 
     close(fd1);
     close(fd2);
-    if (got_input) {
-        free(file1);
-        free(file2);
-    }
     exit(0);
 }
 
@@ -53,8 +42,7 @@ int cpy(int fd1, int fd2){
     while((bytes_count = read(fd1, buffer, 1024)) > 0){
         printf("Read %ld bytes\n", bytes_count);
         if(write(fd2, buffer, bytes_count) != bytes_count){
-            perror("Writing error");
-            exit(1);
+            return(1);
         }
     }
     printf("Successfully wrote all the contents!\n");
