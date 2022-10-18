@@ -1,12 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
-void copy_file(FILE*, FILE*);
 
+int cpy(int, int);
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
+    int fd1, fd2;
     char* file1, *file2;
     int got_input = 0;
+
     if (argc == 3) {
         file1 = argv[1];
         file2 = argv[2];
@@ -22,21 +28,37 @@ int main(int argc, char *argv[]){
         printf("Usage: %s [file1 file2]\n", argv[0]);
         exit(1);
     }
-    FILE* from = fopen(file1, "r");
-    FILE* to = fopen(file2, "w");
-    copy_file(to, from);
-    fclose(to);
-    fclose(from);
+
+    if(((fd1 = open(file1, O_RDONLY)) == -1) || ((fd2=open(file2, O_CREAT|O_WRONLY|O_TRUNC, 0755)) == -1)){
+        perror("Problem reading input");
+        exit(1);
+    }
+
+    cpy(fd1, fd2);
+
+    close(fd1);
+    close(fd2);
     if (got_input) {
         free(file1);
         free(file2);
     }
+    exit(0);
+}
+
+
+
+int cpy(int fd1, int fd2){
+    char buffer[1024] = {0};
+    long bytes_count = 1024;
+    while((bytes_count = read(fd1, buffer, 1024)) > 0){
+        printf("Read %ld bytes\n", bytes_count);
+        if(write(fd2, buffer, bytes_count) != bytes_count){
+            perror("Writing error");
+            exit(1);
+        }
+    }
+    printf("Successfully wrote all the contents!\n");
     return 0;
 }
 
-void copy_file(FILE* to, FILE* from){
-    int rc;
-    while ((rc = fgetc(from)) != EOF)
-        fputc(rc, to);
-}
 
