@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
         int parread;
         while ((parread = read(fd, &parentb[0], 6))) {
 #if defined PRINT
-            printf("PARENT: read %d symbs:\n%s\n", parread, parentb);
+            printf("Father: read %d symbs:\n%s\n", parread, parentb);
 #endif
             write(fparent, &parentb[0], parread);
         }
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
             int chread;
             while ((chread = read(fd, &childb[0], 6))) {
     #if defined PRINT
-                printf("CHILD: read %d symbs:\n%s\n", chread, childb);
+                printf("child: read %d symbs:\n%s\n", chread, childb);
     #endif
                 write(fchild, &childb[0], chread);
             }
