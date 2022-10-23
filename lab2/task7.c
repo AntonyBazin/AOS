@@ -7,11 +7,7 @@
 #include <unistd.h>
 
 /*
-To run in background: add &, example: ./task6 &
-to list processes: ps -uf
-After killing father: son hangs up in interruptable sleep state
-Ctrl+C terminates a job.
-sigint = 2, sigkill = 9
+?
 */
 
 

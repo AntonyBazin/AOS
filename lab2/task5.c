@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+// system stores zombies so that parents can get their exit codes
 
 int main(){
 	printf("I am father before fork. My PID is %d, my PPID is %d, my PGID is %d\n",
