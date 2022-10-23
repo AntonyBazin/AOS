@@ -6,25 +6,31 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+/*
+To run in background: add &, example: ./task6 &
+to list processes: ps -uf
+After killing father: son hangs up in interruptable sleep state
+Ctrl+C terminates a job.
+sigint = 2, sigkill = 9
+*/
+
 
 int main(){
-	int rc, ret_code;
 	printf("I am father before fork. My PID is %d, my PPID is %d, my PGID is %d\n",
 		getpid(), getppid(), getpgid(getpid()));
-	printf("I am father. Syscall \"wait\" returned %d\n", wait(&rc));
 	if (fork()) {
 		printf("I am father after fork. My PID is %d PPID is %d, my PGID is %d\n",
 			getpid(), getppid(), getpgid(getpid()));
-		ret_code = wait(&rc);
-		sleep(1);
-		printf("I am father. I was WAITing for son to terminate with code %d.\n", ret_code);
-		system ("ps -uf");
+		pause();
+		printf("I am father after pause().\n");
 		exit(0);
 	}
 	else {
 		printf("I am son after fork. My PID is %d PPID is %d, my PGID is %d\n",
 					getpid(), getppid(), getpgid(getpid()));
-		printf("I am son. I exit with code 2\n");
+		setpgrp();
+		pause();
+		printf("I am son after pause. I exit with code 2.\n");
 		exit(2);
 	}
 }

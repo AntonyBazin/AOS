@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+
 int main(){
 	printf("I am father before fork. My pid is %d, my ppid is %d\n", getpid(), getppid());
 	if (fork()){
