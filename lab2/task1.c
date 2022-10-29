@@ -33,5 +33,3 @@ char* read_env(char* name, char *ptr) {
 	printf("%s\n", ptr);
 	return ptr;
 }
-// Обзательно дочерний процесс делает setpgrp()
-//

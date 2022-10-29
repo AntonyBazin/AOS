@@ -26,9 +26,6 @@ int main(int argc, char *argv[]){
         int fparent = open("father_out_t8.txt", O_TRUNC | O_CREAT | O_WRONLY);
         int parread;
         while ((parread = read(fd, &parentb[0], 6))) {
-#if defined PRINT
-            printf("Father: read %d symbs:\n%s\n", parread, parentb);
-#endif
             write(fparent, &parentb[0], parread);
         }
         wait(NULL);
@@ -41,9 +38,6 @@ int main(int argc, char *argv[]){
             int fchild = open("child_out_t8.txt", O_TRUNC | O_CREAT | O_WRONLY);
             int chread;
             while ((chread = read(fd, &childb[0], 6))) {
-    #if defined PRINT
-                printf("child: read %d symbs:\n%s\n", chread, childb);
-    #endif
                 write(fchild, &childb[0], chread);
             }
             exit(2);
