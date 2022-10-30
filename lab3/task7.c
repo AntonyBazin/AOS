@@ -20,7 +20,7 @@ int main(void){
 	int pid;
 	int return_code;
 	int wait_code;
-	signal(SIGUSR1, sighandler);
+	//signal(SIGUSR1, sighandler);
 	if((pid = fork())){
 		sleep(1);
 		printf("Sending to child signal %d\n", SIGUSR1);
@@ -29,12 +29,13 @@ int main(void){
 		if (WIFSIGNALED(return_code))
 			printf("Child was stopped by %d\n", WTERMSIG(return_code));
 
-		printf("Chiled exited with %d\n", return_code);
+		printf("Child exited with %d\n", return_code);
 		printf("Got %d from wait\n", wait_code);
 		printf("Set errno: %d\n", errno);
 	} else {
 		printf("I am son. My pid is %d, my ppid is %d\n", getpid(), getppid());
 		pause();
+		printf("Set errno: %d\n", errno); //this code isn't executed
 	}
 	return 0;
 }

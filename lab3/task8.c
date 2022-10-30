@@ -18,18 +18,19 @@ int main(void){
 	int pid;
 	int return_code;
 	int wait_code;
-	signal(SIGALRM, sighandler); // comment this out
+	signal(SIGALRM, sighandler);
 	if((pid = fork())){
+		printf("Sending to child signal %d\n", SIGUSR1);
+		kill(pid, SIGUSR1);
 		wait_code = wait(&return_code);
 		if (WIFSIGNALED(return_code))
 			printf("Child was stopped by %d\n", WTERMSIG(return_code));
 
-		printf("Chiled exited with %d\n", return_code);
+		printf("Child exited with %d\n", return_code);
 		printf("Got %d from wait\n", wait_code);
 		printf("Set errno: %d\n", errno);
 	} else {
 		printf("I am son. My pid is %d, my ppid is %d\n", getpid(), getppid());
-		alarm(2);
 		pause();
 		printf("Set errno: %d\n", errno); // interrupted system call (pause)
 	}
