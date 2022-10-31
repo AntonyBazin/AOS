@@ -24,7 +24,7 @@ int main(void){
 		if (WIFSIGNALED(return_code))
 			printf("Child was stopped by %d\n", WTERMSIG(return_code));
 
-		printf("Child exited with %d\n", return_code);
+		printf("Chiled exited with %d\n", return_code);
 		printf("Got %d from wait\n", wait_code);
 		printf("Set errno: %d\n", errno);
 	} else {

@@ -1,40 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <signal.h>
 
 
-extern int errno;
-
-/*
-Alarms  created  by  alarm() are preserved across execve(2) and 
-are not inherited by children created via fork(2).
-*/
+// When you create a new process, it inherits its parent's mask.
 void sighandler(int);
 
 
-int main(void){
-	int pid;
-	int return_code;
-	int wait_code;
-	signal(SIGALRM, sighandler); // comment this out
-	if((pid = fork())){
-		wait_code = wait(&return_code);
-		if (WIFSIGNALED(return_code))
-			printf("Child was stopped by %d\n", WTERMSIG(return_code));
-
-		printf("Child exited with %d\n", return_code);
-		printf("Got %d from wait\n", wait_code);
-		printf("Set errno: %d\n", errno);
-	} else {
-		printf("I am son. My pid is %d, my ppid is %d\n", getpid(), getppid());
-		alarm(2);
-		pause();
-		printf("Set errno: %d\n", errno); // interrupted system call (pause)
+int main(){
+	sigset_t sigset;
+    signal(SIGINT, sighandler);
+	if ((sigemptyset(&sigset) == -1) || (sigaddset(&sigset, SIGINT) == -1)){
+	   perror("Failed to initialize the signal mask");
+	   return 1;
 	}
+    if (sigprocmask(SIG_BLOCK, &sigset, NULL) == -1){
+        printf("Could not block signal");
+        exit(0);
+    }
+	printf("Blocking all signals now...\n");
+	sleep(10);
+    if (sigprocmask(SIG_UNBLOCK, &sigset, NULL) == -1){
+        printf("Could not unblock signal");
+        exit(0);
+    }
+	printf("Unblocking\n");
+	sleep(10);
 	return 0;
 }
+
 
 void sighandler(int signum){
 	printf("This is my custom handler.\n");
