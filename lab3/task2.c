@@ -13,6 +13,7 @@ void sighandler(int signum){
 	signal(signum, SIG_DFL);
 }
 
+
 int main(void){
 	struct sigaction act;
 	act.sa_handler = sighandler;

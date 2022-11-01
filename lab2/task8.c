@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 /*
-Usage: ./task7 lorem_ipsum.txt
+Usage: ./task8 lorem_ipsum.txt
 */
 
 

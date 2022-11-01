@@ -22,7 +22,7 @@ int main(void){
 	if((pid = fork())){
 		sleep(1);
 		printf("Sending to child signal %d\n", SIGQUIT);
-		kill(pid, SIGUSR1);
+		kill(pid, SIGQUIT);
 		wait_code = wait(&return_code);
 		if (WIFSIGNALED(return_code))
 			printf("Child was stopped by %d\n", WTERMSIG(return_code));
