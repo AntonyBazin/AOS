@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
 		}
 		close(pipe_1[1]);
 		close(pipe_2[0]);
-        	exit(0);
+        exit(0);
 	}
 
 	return 0;
