@@ -16,6 +16,20 @@ extern int errno;
 int main(int argc, char *argv[]){
 	int fd1, fd2;
 
+	struct flock wrlocker, unlocker, rlocker;
+	wrlocker.l_type = F_WRLCK;
+	wrlocker.l_whence = SEEK_SET;
+	wrlocker.l_start = 0;
+	wrlocker.l_len = 0;
+	unlocker.l_type = F_UNLCK;
+	unlocker.l_whence = SEEK_SET;
+	unlocker.l_start = 0;
+	unlocker.l_len = 0;
+	rlocker.l_type = F_RDLCK;
+	rlocker.l_whence = SEEK_SET;
+	rlocker.l_start = 0;
+	rlocker.l_len = 0;
+
 	if (argc != 2){
 		printf("Usage: %s fname\n", argv[0]);
 		exit(1);
@@ -25,26 +39,35 @@ int main(int argc, char *argv[]){
 
 
 	if (fork()) {
+
 		if (((fd1 = open(argv[1], O_WRONLY | O_CREAT, 0755)) == -1)) {
 			perror("open fifofile!\n");
 			exit(1);
 		}
+
         printf("I am father after fork. My PID is %d FD1 is %d\n",
             getpid(), fd1);
         char parentb[100] = {0};
-
-        //for(int j = 0; j < 1000; ++j); // chaotic reads and writes
-        for(int i = 0; i < 100; ++i){
-        	sprintf(msg, "%d", i);
+        for(int i = 0; i < 100; ++i) {
+        	if (fcntl(fd1, F_SETLK, &wrlocker) == -1) {
+				printf("fcntl - cannot set wrlock\n");
+				--i;
+				continue;
+			}
+			sprintf(msg, "%d", i);
         	printf("Write: %s\n", msg);
             write(fd1, msg, strlen(msg));
+            if (fcntl(fd1, F_SETLK, &unlocker) == -1) {
+				printf("fcntl - cannot unset wrlock\n");
+				continue;
+			}
         }
         wait(NULL);
         close(fd1);
         close(fd2);
         } else {
         	if (((fd2 = open(argv[1], O_RDONLY)) == -1)) {
-				perror("open shared file!\n");
+				perror("Son cannot open shared file!\n");
 				exit(1);
 			}
             printf("I am son after fork. My PID is %d FD2 is %d\n",
