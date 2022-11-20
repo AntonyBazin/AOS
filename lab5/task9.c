@@ -67,7 +67,6 @@ void server_process(){
 
         sscanf(msg->text, "%ld%*[^0-9]", &(msg->type));
         strcpy(msg->text, msg_text);
-        printf("Type: %ld\n", msg->type);
         if (msgsnd(client_qid, msg, 50, 0) == -1){
             perror("Server: msgsnd");
             continue;
