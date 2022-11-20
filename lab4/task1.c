@@ -8,6 +8,11 @@
 #include <sys/wait.h>
 #include <string.h>
 
+void sighandler(int signum){
+	printf("This is my custom handler.\n");
+	return;
+}
+
 int main(int argc, char *argv[]){
 	pid_t pid;
 	int pipe_1[2], pipe_2[2];
@@ -68,6 +73,7 @@ int main(int argc, char *argv[]){
 		printf("Child - got message of len %lu from parent: \"%s\"\n", 
 									message_len, buf);
 		close(pipe_2[0]);
+		signal(SIGPIPE, sighandler);
 	    exit(0);
 	}
 

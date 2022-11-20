@@ -15,7 +15,7 @@ struct message{
 };
 
 
-int main(int argc, char* argv[], char* envp[]){ //use ipcs -a here
+int main(int argc, char* argv[], char* envp[]){
     key_t key;
     int msgid, k;
     struct message *m1, *m2;

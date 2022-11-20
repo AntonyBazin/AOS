@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
 	if(pid=fork()){
 		close(pipe_1[1]);
 		while (1) {
-			sleep(1);
+			sleep(2);
 			if ((message_len = read(pipe_1[0], buf, 255))) {
 				if (message_len == -1)
 					printf("Parent - read error\n");

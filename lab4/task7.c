@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
 
 	if (fork()) {
 		if (((fd1 = open(argv[1], O_WRONLY | O_CREAT, 0755)) == -1)) {
-			perror("open fifofile!\n");
+			perror("open file\n");
 			exit(1);
 		}
         printf("I am father after fork. My PID is %d FD1 is %d\n",

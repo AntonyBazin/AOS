@@ -12,14 +12,14 @@ int main(int argc, char* argv[]){
 	pid_t pid;
 	int pipe_1[2];
 
-	if (pipe2(pipe_1, O_NONBLOCK) == -1){
+	if (pipe2(pipe_1, 0) == -1){
 		perror("pipe");
 		exit(1);
 	}
 
 	if((pid=fork())){
 		close(pipe_1[1]);
-		sleep(1); // Needed, w/o it wc will not execute with "wc: 'standard input': Resource temporarily unavailable"
+		//sleep(1); // Needed, w/o it wc will not execute with "wc: 'standard input': Resource temporarily unavailable"
 		dup2(pipe_1[0], STDIN_FILENO);
 	    execlp("wc", "wc", "-l", NULL);
 		close(pipe_1[0]);

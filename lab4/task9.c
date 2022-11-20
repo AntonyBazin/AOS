@@ -71,9 +71,8 @@ int main(int argc, char *argv[]){
             	getpid(), fd2);
             char childb[500] = {0};
             for(int i = 0; i < 100; ++i) {
-            	if (fcntl(fd1, F_SETLK, &rlocker) == -1) {
+            	if (fcntl(fd1, F_SETLKW, &rlocker) == -1) {
 					printf("fcntl - cannot set readlock\n");
-					--i;
 					continue;
 				}
                 read(fd2, childb, 500);

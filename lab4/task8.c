@@ -49,9 +49,8 @@ int main(int argc, char *argv[]){
             getpid(), fd1);
         char parentb[100] = {0};
         for(int i = 0; i < 100; ++i) {
-        	if (fcntl(fd1, F_SETLK, &wrlocker) == -1) {
+        	if (fcntl(fd1, F_SETLKW, &wrlocker) == -1) {
 				printf("fcntl - cannot set wrlock\n");
-				--i;
 				continue;
 			}
 			sprintf(msg, "%d", i);
