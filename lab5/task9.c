@@ -62,11 +62,12 @@ void server_process(){
             continue;
 
         printf("Type = %ld, message = '%s'\n", msg->type, msg->text);
-        sprintf(msg_text, "Response %d from server to %ld", i, msg->type);
+        sprintf(msg_text, "Response %d from server to %ld", i, msg->type); //always to 1 here
         msg->type = strtol(msg->text, end, 10);
 
         sscanf(msg->text, "%ld%*[^0-9]", &(msg->type));
         strcpy(msg->text, msg_text);
+        printf("Type: %ld\n", msg->type);
         if (msgsnd(client_qid, msg, 50, 0) == -1){
             perror("Server: msgsnd");
             continue;
@@ -75,6 +76,7 @@ void server_process(){
     }
     printf("Server: shutdown gracefully\n");
     msgctl(msgid, IPC_RMID, 0);
+    msgctl(client_qid, IPC_RMID, 0);
 }
 
 
@@ -125,7 +127,6 @@ void client_process(){
         free(msg);
     }
     printf("Client: shutdown gracefully\n");
-    msgctl(client_msgid, IPC_RMID, 0);
 }
 
 
