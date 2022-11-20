@@ -26,11 +26,11 @@ void sigint_handler(int signum){
 
 void server_process(){
     key_t server_key, client_key;
-    int msgid, msgsize;
-    int client_qid;
+    int msgid, msgsize, client_qid;
     struct message *msg;
     char msg_text[50];
     pid_t server_pid = getpid();
+    char ** end = 0;
 
     signal(SIGINT, sigint_handler);
 
@@ -43,24 +43,30 @@ void server_process(){
         exit(1);
     }
 
-    if ((msgid = msgget(key, IPC_CREAT | 0660)) == -1){
-        perror("Server: msgget");
+    if ((msgid = msgget(server_key, IPC_CREAT | 0660)) == -1){
+        perror("Server: msgget server");
         exit(1);
     }
-    printf("Hello from server! msgid = %d\n", msgid);
+    if ((client_qid = msgget(client_key, IPC_CREAT | 0660)) == -1){
+        perror("Server: msgget client");
+        exit(1);
+    }
+
+    printf("Hello from server! msgid = %d, ", msgid);
+    printf("Client_qid = %d\n", client_qid);
 
     for(int i = 0; ENABLED; ++i) {
         sleep(1);
         msg = malloc(54);
-        if ((msgsize = msgrcv(msgid, msg, 50, 0, MSG_NOERROR)) == -1)
+        if ((msgsize = msgrcv(msgid, msg, 50, 1, MSG_NOERROR)) == -1)
             continue;
 
         printf("Type = %ld, message = '%s'\n", msg->type, msg->text);
-        sprintf(msg_text, "Responce %d from server to %ld", i, msg->type);
-        strcpy(msg->text, msg_text);
-        client_qid = msg->type;
+        sprintf(msg_text, "Response %d from server to %ld", i, msg->type);
+        msg->type = strtol(msg->text, end, 10);
 
-        msg->type = server_pid;
+        sscanf(msg->text, "%ld%*[^0-9]", &(msg->type));
+        strcpy(msg->text, msg_text);
         if (msgsnd(client_qid, msg, 50, 0) == -1){
             perror("Server: msgsnd");
             continue;
@@ -89,29 +95,29 @@ void client_process(){
         perror("ftok");
         exit(1);
     }
-    
+
     if ((server_msgid = msgget(server_key, IPC_CREAT | 0660)) == -1){
-        perror("Client: msgget key");
+        perror("Client: msgget server");
         exit(1);
     }
     if ((client_msgid = msgget(client_key, IPC_CREAT | 0660)) == -1){
-        perror("Client: msgget PRIVATE");
+        perror("Client: msgget client");
         exit(1);
     }
-    printf("Server_msgid = %d,", server_msgid);
+    printf("Hello from client! Server_msgid = %d, ", server_msgid);
     printf("Client_msgid = %d\n", client_msgid);
 
     for(int i = 0; ENABLED; ++i){
         sleep(1);
         msg = malloc(54);
-        msg->type = client_msgid;
-        sprintf(text, "Msg from client #%d", i);
+        msg->type = 1;
+        sprintf(text, "%dMsg from client #%d", client_pid, i);
         strcpy(msg->text, text);
         if (msgsnd(server_msgid, msg, 50, MSG_NOERROR) == -1){
             perror("Client: msgsnd");
             continue;
         }
-        if ((recv_bytes = msgrcv(client_msgid, msg, 50, 0, MSG_NOERROR)) == -1){ //type = 0, read any
+        if ((recv_bytes = msgrcv(client_msgid, msg, 50, client_pid, MSG_NOERROR)) == -1){ //type = 0, read any
             perror("Client: msgrcv");
             continue;
         }

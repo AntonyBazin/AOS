@@ -40,7 +40,7 @@ void server_process(){
             continue;
 
         printf("Type = %ld, message = '%s'\n", msg->type, msg->text);
-        sprintf(msg_text, "Responce %d from server to %ld", i, msg->type);
+        sprintf(msg_text, "Response %d from server to %ld", i, msg->type);
         strcpy(msg->text, msg_text);
         client_qid = msg->type;
 
