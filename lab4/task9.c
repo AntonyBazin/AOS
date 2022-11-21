@@ -41,19 +41,21 @@ int main(int argc, char *argv[]){
 	if (fork()) {
 
 		if (((fd1 = open(argv[1], O_WRONLY | O_CREAT, 0755)) == -1)) {
-			perror("open shared file");
+			perror("opening shared file failed");
 			exit(1);
 		}
 
         printf("I am father after fork. My PID is %d FD1 is %d\n",
             getpid(), fd1);
-        for(int i = 0; i < 100; ++i) {
+        for(int i = 0; i < 10; ++i) {
         	if (fcntl(fd1, F_SETLKW, &wrlocker) == -1) {
 				printf("fcntl - cannot set wrlock\n");
 				continue;
 			}
 			sprintf(msg, "%d", i);
         	printf("Write: %s\n", msg);
+        	//write(STDOUT_FILENO, msg, strlen(msg));
+        	//lseek(fd1, 0, SEEK_SET);
             write(fd1, msg, strlen(msg));
             if (fcntl(fd1, F_SETLKW, &unlocker) == -1) {
 				printf("fcntl - cannot unlock after wrlock\n");
@@ -64,20 +66,21 @@ int main(int argc, char *argv[]){
         close(fd2);
         } else {
         	if (((fd2 = open(argv[1], O_RDONLY)) == -1)) {
-				perror("Son opening shared file error");
+				perror("Son opening shared file failed");
 				exit(1);
 			}
             printf("I am son after fork. My PID is %d FD2 is %d\n",
             	getpid(), fd2);
-            char childb[500] = {0};
-            for(int i = 0; i < 100; ++i) {
+            char childb[1] = {0};
+            for(int i = 0; i < 10; ++i) {
             	if (fcntl(fd1, F_SETLKW, &rlocker) == -1) {
 					printf("fcntl - cannot set readlock\n");
 					continue;
 				}
-                read(fd2, childb, 500);
+				//lseek(fd2, 0, SEEK_SET);
+                read(fd2, childb, 1);
                 printf("Read: %s\n", childb);
-                if (fcntl(fd1, F_SETLK, &unlocker) == -1) {
+                if (fcntl(fd1, F_SETLKW, &unlocker) == -1) {
 					printf("fcntl - cannot unlock after rlock\n");
 				}
             }
