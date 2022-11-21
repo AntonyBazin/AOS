@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
 
 	if (fork()) {
 
-		if (((fd1 = open(argv[1], O_WRONLY | O_CREAT, 0755)) == -1)) {
+		if (((fd1 = open(argv[1], O_WRONLY | O_CREAT | O_TRUNC, 0755)) == -1)) {
 			perror("opening shared file failed");
 			exit(1);
 		}

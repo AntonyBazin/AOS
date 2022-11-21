@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
 			}
 			sprintf(msg, "%d", i);
         	printf("Write: %s\n", msg);
-        	//lseek(fd1, 0, SEEK_END);
+        	//lseek(fd1, 0, SEEK_SET);
             write(fd1, msg, strlen(msg));
             if (fcntl(fd1, F_SETLK, &unlocker) == -1) {
 				printf("fcntl - cannot unset wrlock\n");
