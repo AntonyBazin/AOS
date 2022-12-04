@@ -53,4 +53,4 @@ int main(int argc, char* argv[], char* envp[]){
         exit(1);
     }
     exit(0);
-}
+} // are queues removed automatically?
