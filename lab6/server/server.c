@@ -20,6 +20,7 @@ int get_randint(int n) {
     return randint % n;
 }
 
+
 void write_log(const char* what){
     struct flock wr_locker, unlocker;
     wr_locker.l_type = F_WRLCK;
@@ -43,6 +44,26 @@ void write_log(const char* what){
         syslog(LOG_INFO, "fcntl - cannot UNSET wr_lock for log file: %m\n");
     }
 }
+
+
+void sh_lock(){
+    if (semop(game->sem, mem_lock, 2) == -1) {
+        write_log("semop: unable to lock shared memory");
+        write_log(strerror(errno));
+        exit(1);
+    }
+    write_log("Shared memory LOCKED");
+}
+
+void sh_unlock() {
+    if (semop(game->sem, mem_lock, 1) == -1) {
+        write_log("semop: unable to unlock shared memory");
+        write_log(strerror(errno));
+        exit(1);
+    }
+    write_log("Shared memory UNLOCKED");
+}
+
 
 void master(){
     struct sockaddr_in client_addr, server_addr;
@@ -117,7 +138,6 @@ void master(){
         sigaddset(&sigset, SIGHUP);
         sigprocmask(SIG_BLOCK, &sigset, NULL);
 
-        char accepted_message[255];
         write_log("Accepted request from ");
         write_log(inet_ntoa(client_addr.sin_addr));
         write_log("\n");
@@ -127,14 +147,14 @@ void master(){
         sigaddset(&sigset, SIGHUP);
         sigprocmask(SIG_UNBLOCK, &sigset, NULL);
     }
-
 }
 
 
 void handler(int conn){
-    const char *cmd = "start";
+    const char *cmd = "start ";
     char *response;
     char user_cmd[strlen(cmd) + 1];
+    unsigned int tasks_number = 0;
     memset(user_cmd, 0, strlen(cmd) + 1);
     if (read(conn, user_cmd, strlen(cmd)) == -1) {
         write_log("read: unable to read from socket ");
@@ -143,16 +163,25 @@ void handler(int conn){
     }
     write_log("Reading from socket: success\n");
 
-    if (strcmp(user_cmd, cmd) != 0) {
-        char message[255];
-        strcpy(message, "Unknown user_cmd: ");
-        strcat(message, user_cmd);
-        write_log(message);
+    if (strncmp(user_cmd, cmd, 6) != 0) {
+        char log[255];
+        strcpy(log, "Unknown user command: ");
+        strcat(log, user_cmd);
+        write_log(log);
+        write_log("\n");
 
-        response = "Список доступных команд: 1. generate";
-        u_short status = strlen(response) + 1;
-        write(conn, &status, sizeof(u_short));
+        response = "Usage: start [N]\nN - number of tasks\n";
+        size_t resp_len = strlen(response) + 1;
+        write(conn, &resp_len, sizeof(size_t));
         write(conn, response, strlen(response) + 1);
         return;
     }
+
+    sscanf(user_cmd, "start %d", &tasks_number);
+
+    sh_lock();
+    game->task_count = tasks_number;
+//    base_grid(&shared->field);
+    sh_unlock();
+
 }

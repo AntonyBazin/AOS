@@ -26,7 +26,7 @@ typedef struct task{
 
 typedef struct game{
     task_t* tasks;
-    int task_count;
+    unsigned int task_count;
     double accracy;
     int sem;
 } game_t;
@@ -46,6 +46,9 @@ game_t* game;
 int get_randint(int n);
 
 void write_log(const char* what);
+
+void sh_lock();
+void sh_unlock();
 
 void master();
 void handler(int conn);
