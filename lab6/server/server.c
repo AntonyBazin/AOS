@@ -130,6 +130,29 @@ void master(){
 
 }
 
+
 void handler(int conn){
-    
+    const char *cmd = "start";
+    char *response;
+    char user_cmd[strlen(cmd) + 1];
+    memset(user_cmd, 0, strlen(cmd) + 1);
+    if (read(conn, user_cmd, strlen(cmd)) == -1) {
+        write_log("read: unable to read from socket ");
+        write_log(strerror(errno));
+        return;
+    }
+    write_log("Reading from socket: success\n");
+
+    if (strcmp(user_cmd, cmd) != 0) {
+        char message[255];
+        strcpy(message, "Unknown user_cmd: ");
+        strcat(message, user_cmd);
+        write_log(message);
+
+        response = "Список доступных команд: 1. generate";
+        u_short status = strlen(response) + 1;
+        write(conn, &status, sizeof(u_short));
+        write(conn, response, strlen(response) + 1);
+        return;
+    }
 }
